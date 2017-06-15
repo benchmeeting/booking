@@ -1,0 +1,12 @@
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+THREADS_PER_PAGE = 4
+
+# database
+dbuser = 'root'
+dbpass = ''
+dbhost = 'localhost'
+dbname = 'booking'
+SQLALCHEMY_DATABASE_URI = 'mysql://' + dbuser + ':' + dbpass + '@' + dbhost + '/' + dbname
+SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
