@@ -1,5 +1,5 @@
 from app import application
-from app.utils.representation import SimpleDict
+from app.utils.representation import SimpleDict, DictOrDateTime
 from flask import request
 from app.models import Item, Reservation
 import json
@@ -9,7 +9,7 @@ import json
 @application.route("/fetch", methods=['GET'])
 def get_all():
     items = Item.query.all() or []
-    return json.dumps(items, cls=SimpleDict)
+    return json.dumps(items, cls=DictOrDateTime)
 
 
 @application.route("/fetch/<int:id>", methods=['GET'])
