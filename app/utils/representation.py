@@ -1,6 +1,4 @@
 import json
-import datetime
-from sqlalchemy.orm.collections import InstrumentedList
 
 
 class SimpleDict(json.JSONEncoder):
@@ -11,9 +9,6 @@ class SimpleDict(json.JSONEncoder):
 class DictOrDateTime(json.JSONEncoder):
     def default(self, o):
         try:
-            return o.__dict__
+            return o.__getstate__()
         except AttributeError:
-            if isinstance(o, datetime.date):
-                return o.isoformat()
-            else:
-                return None
+            return o.__dict__

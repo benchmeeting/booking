@@ -1,21 +1,24 @@
 from app import application
 from app.utils.representation import SimpleDict, DictOrDateTime
-from flask import request
+from flask import request, Response
 from app.models import Item, Reservation
 import json
 
+response = Response(content_type='application/json; charset=utf-8')
 
 @application.route("/", methods=['GET'])
 @application.route("/fetch", methods=['GET'])
 def get_all():
     items = Item.query.all() or []
-    return json.dumps(items, cls=DictOrDateTime)
+    response.response = json.dumps(items, cls=DictOrDateTime)
+    return response
 
 
 @application.route("/fetch/<int:id>", methods=['GET'])
 def get_by_id(id):
-    item = Item.query.filter_by(id=id)
-    return item
+    item = Item.query.filter_by(id=id).first()
+    response.response = json.dumps(item, cls=DictOrDateTime)
+    return response
 
 
 @application.route("/create", methods=['POST'])
