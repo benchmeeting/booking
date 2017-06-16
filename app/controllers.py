@@ -1,10 +1,13 @@
-from app import application
-from app.utils.representation import SimpleDict, DictOrDateTime
-from flask import request, Response
+from app import application, db
+from app.utils.representation import DictOrDateTime
+from flask import Response, request, json
 from app.models import Item, Reservation
-import json
+from sqlalchemy import exc
 
+
+# boilerplate
 response = Response(content_type='application/json; charset=utf-8')
+
 
 @application.route("/", methods=['GET'])
 @application.route("/fetch", methods=['GET'])
@@ -22,8 +25,18 @@ def get_by_id(id):
 
 
 @application.route("/create", methods=['POST'])
-def create(request):
-    return request.item_id
+def create():
+    item = json.loads(request.form['item'])
+    reservation = Reservation()
+    reservation.update_from_json(**item)
+    try:
+        db.session.add(reservation)
+        db.session.commit()
+    except exc.OperationalError as err:
+        response.status_code = 400
+        response.response = json.dumps({"message": str(err)})
+    finally:
+        return response
 
 
 @application.route("/update", methods=['PUT', 'PATCH'])
