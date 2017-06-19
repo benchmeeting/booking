@@ -35,15 +35,44 @@ def create():
     except exc.OperationalError as err:
         response.status_code = 400
         response.response = json.dumps({"message": str(err)})
+    except Exception as err:
+        response.status_code = 500
+        response.response = json.dumps({"message": str(err)})
+    else:
+        response.status_code = 201
+        response.response = json.dumps(item)
     finally:
         return response
 
 
 @application.route("/update", methods=['PUT', 'PATCH'])
-def update(request):
-    return -1
+def update():
+    item = json.loads(request.form['item'])
+    reservation = Reservation.query.filter_by(id=item['id']).first()
+    reservation.update_from_json(**item)
+    try:
+        db.session.add(reservation)
+        db.session.commit()
+    except exc.OperationalError as err:
+        response.status_code = 400
+        response.response = json.dumps({"message": str(err)})
+    else:
+        response.status_code = 204
+    finally:
+        return response
 
 
-@application.route("/delete/<int:id>", methods=['DELETE'])
-def delete(id):
-    return -1
+@application.route("/delete", methods=['DELETE'])
+def delete():
+    id = request.form['id']
+    reservation = Reservation.query.filter_by(id=id).first()
+    try:
+        db.session.delete(reservation)
+        db.session.commit()
+    except exc.OperationalError as err:
+        response.status_code = 400
+        response.response = json.dumps({"message": str(err)})
+    else:
+        response.status_code = 204
+    finally:
+        return response
